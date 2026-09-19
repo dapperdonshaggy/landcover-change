@@ -394,3 +394,35 @@ open outputs/
 | Change target CRS                  | Edit `config.yaml`, run both stages                                     |
 | Save your changes                  | `git add . && git commit -m "..." && git push`                          |
 | Share the project                  | Send the GitHub URL                                                     |
+
+
+## Technical Notes
+
+### Vectorization
+
+The pipeline uses NumPy's vectorized operations wherever they matter:
+
+- **NoData masking**: `np.isin()` masks every pixel not in the class
+  list in a single pass, rather than looping pixel-by-pixel.
+- **Common valid mask** (Stage 1): all rasters are stacked into a 3D
+  array and reduced with `np.all(..., axis=0)` in one operation.
+- **Class counting**: `np.bincount()` computes every class count in a
+  single pass over the raster — no loop over classes.
+- **Change encoding** (Stage 2): transitions are computed with
+  `data1[valid] * 10 + data2[valid]` — a pure NumPy expression.
+- **Transition statistics**: `np.bincount()` on the change matrix
+  gives every (from, to) count in one pass, replacing the naive
+  nested-loop approach.
+
+Where loops remain (e.g. iterating over year pairs, or building CSV
+rows), they exist for readability and don't affect performance at
+typical dataset sizes.
+
+### Why `np.bincount` Instead of Loops
+
+`np.bincount` scans the raster once and increments a counter for each
+value it encounters. A naive approach would scan the entire raster
+once per class — O(n_classes × n_pixels) work instead of O(n_pixels).
+
+For an 8-class, 5-million-pixel raster, that's the difference between
+~5 million and ~40 million array operations.
