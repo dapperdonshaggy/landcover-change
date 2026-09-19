@@ -1,0 +1,1 @@
+"""Land cover change detection pipeline."""

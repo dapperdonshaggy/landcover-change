@@ -1,0 +1,17 @@
+# Data folders
+raw_rasters/
+aligned_rasters/
+outputs/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+
+# Rasters
+*.tif
+*.tiff

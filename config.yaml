@@ -1,0 +1,25 @@
+# =====================================================================
+# Configuration for the land cover change detection pipeline
+# =====================================================================
+# Edit these paths to match your project. Relative paths are resolved
+# from the folder that contains this config.yaml file.
+
+# --- Input / output folders ------------------------------------------
+input_dir: raw_rasters              # Where your raw .tif files live
+aligned_dir: aligned_rasters        # Stage 1 writes aligned rasters here
+output_dir: outputs                 # Stage 2 writes results here
+
+# --- Class definitions ----------------------------------------------
+class_csv: classes.csv              # CSV with columns: code, name, color
+
+# --- Spatial settings -----------------------------------------------
+target_epsg: 32630                  # UTM Zone 30N (Ghana). Change for other areas.
+nodata: 0                           # Value representing NoData
+resampling: nearest                 # 'nearest' for classified rasters
+
+# --- File matching --------------------------------------------------
+file_pattern: "*.tif"               # Which files to pick up from input_dir
+year_pattern: "\\d{4}"              # Regex to extract year from filename
+
+# --- Visualization --------------------------------------------------
+figure_dpi: 300
