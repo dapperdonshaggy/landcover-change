@@ -342,6 +342,7 @@ def make_yearly_bar_graphs(rd: RasterData, output_dir: Path, dpi: int) -> Path:
     labels = [rd.names[c] for c in codes]
     colors = [rd.colors[c] for c in codes]
 
+    
     # Precompute areas per year in one vectorized pass each
     areas_by_year: Dict[str, List[float]] = {}
     for year in rd.years:
@@ -353,6 +354,10 @@ def make_yearly_bar_graphs(rd: RasterData, output_dir: Path, dpi: int) -> Path:
     for year in rd.years:
         areas = areas_by_year[year]
 
+        # Calculate percentages
+        total_area = sum(areas)
+        percentages = [(area/total_area)*100 for area in areas]
+            
         fig, ax = plt.subplots(figsize=(12, 7))
         bars = ax.bar(labels, areas, color=colors,
                       edgecolor="black", linewidth=0.5)
@@ -363,11 +368,11 @@ def make_yearly_bar_graphs(rd: RasterData, output_dir: Path, dpi: int) -> Path:
         ax.tick_params(axis="x", rotation=45)
         ax.grid(axis="y", alpha=0.3, linestyle="--")
 
-        for bar, area in zip(bars, areas):
+        for bar, area, pct in zip(bars, areas, percentages):
             if area > 0:
                 ax.text(bar.get_x() + bar.get_width() / 2,
                         bar.get_height() * 1.01,
-                        f"{area:,.0f}",
+                        f"{area:,.0f}\n({pct:.2f}%)",
                         ha="center", va="bottom", fontsize=9)
 
         plt.tight_layout()
@@ -399,11 +404,11 @@ def make_yearly_bar_graphs(rd: RasterData, output_dir: Path, dpi: int) -> Path:
         ax.tick_params(axis="x", rotation=45, labelsize=9)
         ax.grid(axis="y", alpha=0.3, linestyle="--")
 
-        for bar, area in zip(bars, areas):
+        for bar, area, pct in zip(bars, areas, percentages):
             if area > 0:
                 ax.text(bar.get_x() + bar.get_width() / 2,
                         bar.get_height() * 1.01,
-                        f"{area:,.0f}",
+                        f"{area:,.0f}\n({pct:.2f}%)",
                         ha="center", va="bottom",
                         fontsize=8, fontweight="bold")
 
